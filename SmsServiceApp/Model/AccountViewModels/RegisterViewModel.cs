@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace WebCustomerApp.Models.AccountViewModels
 {
@@ -23,5 +24,11 @@ namespace WebCustomerApp.Models.AccountViewModels
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [StringLength(13, ErrorMessage = "{0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+        [DataType(DataType.PhoneNumber)]
+        [Display(Name = "Phone number")]
+        public string PhoneNumber { get; set; }
     }
 }
