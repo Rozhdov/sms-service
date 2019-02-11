@@ -26,6 +26,7 @@ namespace WebCustomerApp.Models.AccountViewModels
         public string ConfirmPassword { get; set; }
 
         [Required]
+        [RegularExpression(@"^[0-9\+\*\#]{3,13}$", ErrorMessage = "Incorrect phone number")]
         [StringLength(13, ErrorMessage = "{0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Phone number")]

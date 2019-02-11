@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WebCustomerApp.Data;
 using WebCustomerApp.Models;
 using WebCustomerApp.Services;
+using WebCustomerApp.Managers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace WebCustomerApp
@@ -39,9 +40,10 @@ namespace WebCustomerApp
                 opts.Password.RequireLowercase = true;
                 opts.Password.RequireUppercase = true;
                 opts.Password.RequireDigit = true;
-
             }).AddEntityFrameworkStores<ApplicationDbContext>()
               .AddDefaultTokenProviders();
+
+            services.AddScoped<IUserContactManager, UserContactManager>();
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
