@@ -17,7 +17,7 @@ namespace WebCustomerApp.Models.ContactsViewModels
         public string Name { get; set; }
 
         [Display(Name = "Roles")]
-        List<Tuple<bool, string>> Groups { get; set; }
+        public IEnumerable<string> Groups { get; set; }
     }
 
 }

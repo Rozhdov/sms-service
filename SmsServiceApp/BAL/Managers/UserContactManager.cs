@@ -5,6 +5,7 @@ using WebCustomerApp.Models.ContactsViewModels;
 using WebCustomerApp.Models;
 using WebCustomerApp.Data;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebCustomerApp.Managers
 {
@@ -32,13 +33,12 @@ namespace WebCustomerApp.Managers
                 Name = Contact.Name
             };
             db.UserContacts.Add(newContact);
-            foreach (Tuple<bool, string> iter in Contact.Groups)
+            if (Contact.Groups != null)
+            foreach (string iter in Contact.Groups)
             {
-                if (iter.Item1)
-                {
                     // check, if group exist
                     var group = (from ucg in db.UserContactGroups
-                                 where ucg.Group == iter.Item2 && ucg.UserId == AppUserId
+                                 where ucg.Group == iter && ucg.UserId == AppUserId
                                  select ucg).FirstOrDefault();
                     if (group != null)
                     {
@@ -49,7 +49,6 @@ namespace WebCustomerApp.Managers
                         };
                         newContact.ContactGroups.Add(cg);
                     }
-                }
             }
             db.SaveChanges();
             return true;
@@ -74,13 +73,11 @@ namespace WebCustomerApp.Managers
                 return false;
 
             updatedContact.Name = Contact.Name;
-            foreach (Tuple<bool, string> iter in Contact.Groups)
+            foreach (string iter in Contact.Groups)
             {
-                if (iter.Item1)
-                {
                     // check, if group exist
                     var group = (from ucg in db.UserContactGroups
-                                 where ucg.Group == iter.Item2 && ucg.UserId == AppUserId
+                                 where ucg.Group == iter && ucg.UserId == AppUserId
                                  select ucg).FirstOrDefault();
                     if (group != null)
                     {
@@ -91,7 +88,7 @@ namespace WebCustomerApp.Managers
                         };
                         updatedContact.ContactGroups.Add(cg);
                     }
-                }
+                
             }
             db.SaveChanges();
             return true;
@@ -134,6 +131,7 @@ namespace WebCustomerApp.Managers
                     PhoneNumber = iter.PhoneNumber,
                     Groups = ""
                 });
+                if (iter.ContactGroups != null)
                 foreach (var jter in iter.ContactGroups)
                 {
                     result.Last().Groups += jter.UserContactGroup.Group;
@@ -155,6 +153,39 @@ namespace WebCustomerApp.Managers
                 return false;
 
             db.UserContacts.Remove(userContact);
+            db.SaveChanges();
+            return true;
+        }
+
+
+        public SelectList GetAvailableContactGroups(string AppUserId)
+        {
+            if (AppUserId == null)
+            {
+                return null;
+            }
+            var groups = from g in db.UserContactGroups
+                         select g;
+            SelectList result = new SelectList(groups, "Group", "Group");
+            return result;
+        }
+
+        public bool AddContactGroup(string AppUserId, AddContactGroupViewModel ContactGroup)
+        {
+            if (AppUserId == null || ContactGroup.Group == null)
+                return false;
+            var temp = (from ucg in db.UserContactGroups
+                        where ucg.Group == ContactGroup.Group
+                        select ucg).FirstOrDefault();
+            if (temp != null)
+                return false;
+            var newGroup = new UserContactGroup()
+            {
+                UserId = AppUserId,
+                Group = ContactGroup.Group,
+                Description = ContactGroup.Description
+            };
+            db.UserContactGroups.Add(newGroup);            
             db.SaveChanges();
             return true;
         }

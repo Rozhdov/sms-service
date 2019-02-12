@@ -9,6 +9,7 @@ namespace WebCustomerApp.Models.ContactsViewModels
     {
         [Required]
         [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^[0-9\+\*\#]{3,13}$", ErrorMessage = "Incorrect phone number")]
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; }
 
@@ -17,12 +18,7 @@ namespace WebCustomerApp.Models.ContactsViewModels
         public string Name { get; set; }
 
         [Display(Name = "Roles")]
-        public List<Tuple<bool, string>> Groups {get; set;}   
-
-        public AddContactViewModel()
-        {
-            Groups = new List<Tuple<bool, string>>();
-        }
+        public IEnumerable<string> Groups { get; set; }
     }
 
 }
