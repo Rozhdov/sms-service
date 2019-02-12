@@ -7,7 +7,7 @@ namespace WebCustomerApp.Models
     public class UserContactGroup
     {
         public int Id { get; set; }
-        public IList<ContactGroup> ContactGroups { get; set; }
+        public ICollection<ContactGroup> ContactGroups { get; set; }
 
         public string UserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }

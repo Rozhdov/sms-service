@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
-
 namespace WebCustomerApp.Models.ContactsViewModels
 {
-    public class AddContactGroupViewModel
+    public class ContactGroupListViewModel
     {
         [Required]
         [DataType(DataType.Text)]
@@ -15,5 +14,6 @@ namespace WebCustomerApp.Models.ContactsViewModels
         [DataType(DataType.Text)]
         [Display(Name = "Description")]
         public string Description { get; set; }
+
     }
 }

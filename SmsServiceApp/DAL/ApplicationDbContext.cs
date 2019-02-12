@@ -56,12 +56,14 @@ namespace WebCustomerApp.Data
             builder.Entity<ContactGroup>()
                 .HasOne<UserContact>(cg => cg.UserContact)
                 .WithMany(uc => uc.ContactGroups)
-                .HasForeignKey(cg => cg.UserContactId);
+                .HasForeignKey(cg => cg.UserContactId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<ContactGroup>()
                 .HasOne<UserContactGroup>(cg => cg.UserContactGroup)
                 .WithMany(ucg => ucg.ContactGroups)
-                .HasForeignKey(cg => cg.UserContactGroupId);
+                .HasForeignKey(cg => cg.UserContactGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<ApplicationUser>()
                 .HasMany<Mailing>(u => u.Mailings)

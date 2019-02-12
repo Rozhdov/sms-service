@@ -12,6 +12,9 @@ namespace WebCustomerApp.Managers
         IEnumerable<ContactListViewModel> GetUserContacts(string AppUserId, int Num);
         SelectList GetAvailableContactGroups(string AppUserId);
 
+        IEnumerable<ContactGroupListViewModel> GetContactGroups(string AppUserId);
+        IEnumerable<ContactGroupListViewModel> GetContactGroups(string AppUserId, int Num);
+
         bool AddContactGroup(string AppUserId, AddContactGroupViewModel ContactGroup);
 
         bool AddUserContact(string AppUserId, AddContactViewModel Contact);

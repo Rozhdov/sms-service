@@ -8,10 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
-using WebCustomerApp.Models.AccountViewModels;
+using WebCustomerApp.Models.ContactsViewModels;
 using WebCustomerApp.Services;
 using WebCustomerApp.Managers;
 
@@ -42,9 +39,8 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Add(WebCustomerApp.Models.ContactsViewModels.AddContactViewModel newContact, string returnUrl = null)
+        public IActionResult Index(AddContactViewModel newContact)
         {
-            ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -52,7 +48,7 @@ namespace WebApp.Controllers
                 if(!result)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid contact");
-                    return View();
+                    return RedirectToAction("Index", "Contacts");
                 }
                 else
                 {
@@ -63,6 +59,33 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
+        public IActionResult Groups()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            ViewBag.Groups = _contactManager.GetContactGroups(userId, 20);
+            return View();
+        }
+
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public IActionResult Groups(AddContactGroupViewModel newGroup)
+        {
+            if (ModelState.IsValid)
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                bool result = _contactManager.AddContactGroup(userId, newGroup);
+                if (!result)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid contact");
+                    return RedirectToAction("Groups", "Contacts");
+                }
+                else
+                {
+                    return RedirectToAction("Groups", "Contacts");
+                }
+            }
+            return View();
+        }
 
     }
 }

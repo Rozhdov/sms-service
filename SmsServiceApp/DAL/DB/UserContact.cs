@@ -8,7 +8,7 @@ namespace WebCustomerApp.Models
     {
         public int Id { get; set; }
         public ICollection<Message> Messages { get; set; }
-        public IList<ContactGroup> ContactGroups { get; set; }
+        public ICollection<ContactGroup> ContactGroups { get; set; }
 
 
         public string UserId { get; set; }
