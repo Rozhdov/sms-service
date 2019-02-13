@@ -60,8 +60,10 @@
                 <th>@iter.Name</th>
             }
             <th>@iter.Groups</th>
-            <th><a class="btn btn-default btn-sm" role="button" href="/Contacts/RemoveContact?UserContactId=@iter.Id">Delete</a>
-            <a class="btn btn-default btn-sm" role="button" href="/Contacts/ChangeContact?UserContactId=@iter.Id">Edit</a></th>
+            <th>
+                <a class="btn btn-default btn-sm" role="button" asp-action="RemoveContact" asp-controller="Contacts" asp-route-UserContactId="@iter.Id">Delete</a>
+                <a class="btn btn-default btn-sm" role="button" asp-action="ChangeContact" asp-controller="Contacts" asp-route-UserContactId="@iter.Id">Edit</a>
+            </th>
         </tr>
         }
     </tbody>   

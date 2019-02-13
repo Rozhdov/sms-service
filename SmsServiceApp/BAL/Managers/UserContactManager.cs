@@ -76,7 +76,7 @@ namespace WebCustomerApp.Managers
             if (AppUserId == null || Contact.PhoneNumber == null)
                 return false;
 
-            var updatedContact = (from uc in db.UserContacts
+            var updatedContact = (from uc in db.UserContacts.Include(uc => uc.ContactGroups)
                                   where uc.PhoneNumber == Contact.PhoneNumber && uc.UserId == AppUserId
                                   select uc).FirstOrDefault();
             if (updatedContact == null)
@@ -92,6 +92,7 @@ namespace WebCustomerApp.Managers
             {
                 updatedContact.ContactGroups.Remove(iter);
             }
+            db.SaveChanges();
 
             // Adding contact to selected groups
             if (Contact.Groups != null)
@@ -300,11 +301,14 @@ namespace WebCustomerApp.Managers
 
         public bool EditContactGroup(string AppUserId, EditContactGroupViewModel ContactGroup)
         {
-            if (AppUserId == null || ContactGroup.Group == null)
+            if (AppUserId == null || ContactGroup.Group == null || db.UserContactGroups.Any(ucg => ucg.Group == ContactGroup.Group))
                 return false;
 
-            var updatedContactGroup = db.UserContactGroups.Find(ContactGroup.Id);
-            if (updatedContactGroup == null || updatedContactGroup.UserId != AppUserId)
+            var updatedContactGroup = (from cg in db.UserContactGroups
+                                       where cg.UserId == AppUserId && cg.Id == ContactGroup.Id
+                                       select cg).FirstOrDefault();
+
+            if (updatedContactGroup == null)
                 return false;
 
             updatedContactGroup.Group = ContactGroup.Group;

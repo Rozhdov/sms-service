@@ -165,7 +165,7 @@ namespace WebApp.Controllers
             if (group == null)
             {
                 ModelState.AddModelError(string.Empty, "Modify failed");
-                return RedirectToAction("Index", "Groups");
+                return RedirectToAction("Groups", "Contacts");
             }
             else
             {
@@ -189,10 +189,10 @@ namespace WebApp.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Groups"); ;
+                    return RedirectToAction("Groups", "Contacts"); ;
                 }
             }
-            return RedirectToAction("Index", "Groups");
+            return RedirectToAction("Groups", "Contacts");
         }
 
 
