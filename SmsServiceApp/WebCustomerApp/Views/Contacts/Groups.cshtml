@@ -20,7 +20,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description"></label>
-                <input asp-for="Description" class="form-control" />
+                <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <button type="submit" class="btn btn-default">Add Group</button>
@@ -35,22 +35,25 @@
         <tr>
             <th scope="col">Group</th>
             <th scope="col">Description</th>
+            <th scope="col">Controls</th>
         </tr>
     </thead>
     <tbody>
         @foreach (ContactGroupListViewModel iter in ViewBag.Groups)
         {
-            <tr>
-                <th scope="row">@iter.Group</th>
-                @if (iter.Description == "" || iter.Description == null)
-                {
-                    <th>No description</th>
-                }
-                else
-                {
-                    <th>@iter.Description</th>
-                }
-            </tr>
+        <tr>
+            <th scope="row">@iter.Group</th>
+            @if (iter.Description == "" || iter.Description == null)
+            {
+                <th>No description</th>
+            }
+            else
+            {
+                <th>@iter.Description</th>
+            }
+            <th><a class="btn btn-default btn-sm" role="button" href="/Contacts/RemoveContactGroup?ContactGroupId=@iter.Id">Delete</a>
+            <a class="btn btn-default btn-sm" role="button" href="/Contacts/ChangeContactGroup?UserContactGroup=@iter.Id">Edit</a></th>
+        </tr>
         }
     </tbody>
 </table>

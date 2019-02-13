@@ -47,7 +47,7 @@ namespace WebApp.Controllers
                 bool result = _contactManager.AddUserContact(userId, newContact);
                 if(!result)
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid contact");
+                    ModelState.AddModelError(string.Empty, "Adding failed");
                     return RedirectToAction("Index", "Contacts");
                 }
                 else
@@ -58,16 +58,70 @@ namespace WebApp.Controllers
             return View();
         }
 
+        public IActionResult RemoveContact(int UserContactId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            bool result = _contactManager.RemoveUserContact(userId, UserContactId);
+            if(!result)
+            {
+                ModelState.AddModelError(string.Empty, "Delete failed");
+                return RedirectToAction("Index", "Contacts");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Contacts");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ChangeContact(int UserContactId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var contact = _contactManager.FindContact(userId, UserContactId);
+            ViewBag.Groups = _contactManager.GetAvailableContactGroups(userId);
+            if (contact == null)
+            {
+                ModelState.AddModelError(string.Empty, "Modify failed");
+                return RedirectToAction("Index", "Contacts");
+            }
+            else
+            {
+                return View(contact);
+            }
+        }
+        
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public IActionResult ChangeContact(EditContactViewModel UserContact)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var result = _contactManager.EditUserContact(userId, UserContact);
+            if (ModelState.IsValid)
+            {
+                if (result == false)
+                {
+                    ModelState.AddModelError(string.Empty, "Modify failed");
+                    return View(UserContact);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Contacts"); ;
+                }
+            }
+            return RedirectToAction("Index", "Contacts");
+        }
+
         [HttpGet]
         public IActionResult Groups()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             ViewBag.Groups = _contactManager.GetContactGroups(userId, 20);
+            var temp = _contactManager.GetContactGroups(userId, 20);
             return View();
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public IActionResult Groups(AddContactGroupViewModel newGroup)
         {
             if (ModelState.IsValid)
@@ -86,6 +140,61 @@ namespace WebApp.Controllers
             }
             return View();
         }
+
+        public IActionResult RemoveContactGroup(int ContactGroupId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            bool result = _contactManager.RemoveContactGroup(userId, ContactGroupId);
+            if (!result)
+            {
+                ModelState.AddModelError(string.Empty, "Delete failed");
+                return RedirectToAction("Groups", "Contacts");
+            }
+            else
+            {
+                return RedirectToAction("Groups", "Contacts");
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult ChangeContactGroup(int UserContactGroupId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var group = _contactManager.FindContactGroup(userId, UserContactGroupId);
+            if (group == null)
+            {
+                ModelState.AddModelError(string.Empty, "Modify failed");
+                return RedirectToAction("Index", "Groups");
+            }
+            else
+            {
+                return View(group);
+            }
+        }
+
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public IActionResult ChangeContactGroup(EditContactGroupViewModel UserContactGroup)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var result = _contactManager.EditContactGroup(userId, UserContactGroup);
+            if (ModelState.IsValid)
+            {
+                if (result == false)
+                {
+                    ModelState.AddModelError(string.Empty, "Modify failed");
+                    return View(UserContactGroup);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Groups"); ;
+                }
+            }
+            return RedirectToAction("Index", "Groups");
+        }
+
 
     }
 }

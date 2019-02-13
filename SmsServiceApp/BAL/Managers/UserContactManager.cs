@@ -71,7 +71,7 @@ namespace WebCustomerApp.Managers
         }
 
 
-        public bool EditUserContact(string AppUserId, AddContactViewModel Contact)
+        public bool EditUserContact(string AppUserId, EditContactViewModel Contact)
         {
             if (AppUserId == null || Contact.PhoneNumber == null)
                 return false;
@@ -95,8 +95,9 @@ namespace WebCustomerApp.Managers
 
             // Adding contact to selected groups
             if (Contact.Groups != null)
-            foreach (string iter in Contact.Groups)
             {
+                foreach (string iter in Contact.Groups)
+                {
                     // check, if group exist
                     var group = (from ucg in db.UserContactGroups
                                  where ucg.Group == iter && ucg.UserId == AppUserId
@@ -109,7 +110,8 @@ namespace WebCustomerApp.Managers
                             UserContactGroup = group
                         };
                         updatedContact.ContactGroups.Add(cg);
-                    }                
+                    }
+                }
             }
             db.SaveChanges();
             return true;
@@ -127,6 +129,7 @@ namespace WebCustomerApp.Managers
             {
                 result.Add(new ContactListViewModel()
                 {
+                    Id = iter.Id,
                     Name = iter.Name,
                     PhoneNumber = iter.PhoneNumber,
                     Groups = ""                    
@@ -156,6 +159,7 @@ namespace WebCustomerApp.Managers
             {
                 result.Add(new ContactListViewModel()
                 {
+                    Id = iter.Id,
                     Name = iter.Name,
                     PhoneNumber = iter.PhoneNumber,
                     Groups = ""
@@ -174,13 +178,13 @@ namespace WebCustomerApp.Managers
             return result;
         }
 
-        public bool RemoveUserContact(string AppUserId, string UserContactPhone)
+        public bool RemoveUserContact(string AppUserId, int UserContactId)
         {
-            if (AppUserId == null || UserContactPhone == null)
+            if (AppUserId == null)
                 return false;
 
             UserContact userContact = (from uc in db.UserContacts
-                                       where uc.PhoneNumber == UserContactPhone && uc.UserId == AppUserId
+                                       where uc.Id == UserContactId && uc.UserId == AppUserId
                                        select uc).FirstOrDefault();
             if (userContact == null)
                 return false;
@@ -237,6 +241,7 @@ namespace WebCustomerApp.Managers
             {
                 result.Add(new ContactGroupListViewModel()
                 {
+                    Id = iter.Id,
                     Group = iter.Group,
                     Description = iter.Description
                 });
@@ -259,11 +264,87 @@ namespace WebCustomerApp.Managers
             {
                 result.Add(new ContactGroupListViewModel()
                 {
+                    Id = iter.Id,
                     Group = iter.Group,
                     Description = iter.Description
                 });
             }
             return result;
+        }
+
+        public EditContactViewModel FindContact(string AppUserId, int UserContactId)
+        {
+            if (AppUserId == null)
+                return null;
+            var contact = (from uc in db.UserContacts
+                           .Include(uc => uc.ContactGroups)
+                           .ThenInclude(cg => cg.UserContactGroup)
+                           where uc.Id == UserContactId && uc.UserId == AppUserId
+                           select uc).FirstOrDefault();
+            if (contact == null)
+                return null;
+            else
+            {
+                var temp = from cg in contact.ContactGroups
+                           select cg.UserContactGroup.Group;
+
+                var result = new EditContactViewModel()
+                {
+                    PhoneNumber = contact.PhoneNumber,
+                    Name = contact.Name,
+                    Groups = temp
+                };
+                return result;               
+            }
+        }
+
+        public bool EditContactGroup(string AppUserId, EditContactGroupViewModel ContactGroup)
+        {
+            if (AppUserId == null || ContactGroup.Group == null)
+                return false;
+
+            var updatedContactGroup = db.UserContactGroups.Find(ContactGroup.Id);
+            if (updatedContactGroup == null || updatedContactGroup.UserId != AppUserId)
+                return false;
+
+            updatedContactGroup.Group = ContactGroup.Group;
+            updatedContactGroup.Description = ContactGroup.Description;
+
+            db.SaveChanges();
+            return true;
+        }
+
+        public bool RemoveContactGroup(string AppUserId, int UserContactGroupId)
+        {
+            if (AppUserId == null)
+                return false;
+            var ContactGroupToRemove = db.UserContactGroups.Find(UserContactGroupId);
+            if (ContactGroupToRemove == null || ContactGroupToRemove.UserId != AppUserId)
+                return false;
+            db.UserContactGroups.Remove(ContactGroupToRemove);
+            db.SaveChanges();
+            return true;
+        }
+
+        public EditContactGroupViewModel FindContactGroup(string AppUserId, int UserContactGroupId)
+        {
+            if (AppUserId == null)
+                return null;
+            var group = (from uc in db.UserContactGroups
+                           where uc.Id == UserContactGroupId && uc.UserId == AppUserId
+                           select uc).FirstOrDefault();
+            if (group == null)
+                return null;
+            else
+            {
+                var result = new EditContactGroupViewModel()
+                {
+                    Group = group.Group,
+                    Description = group.Description,
+                    Id = group.Id
+                };
+                return result;
+            }
         }
     }
 }

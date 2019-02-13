@@ -7,6 +7,9 @@ namespace WebCustomerApp.Models.ContactsViewModels
     public class ContactGroupListViewModel
     {
         [Required]
+        public int Id { get; set; }
+
+        [Required]
         [DataType(DataType.Text)]
         [Display(Name = "Group")]
         public string Group { get; set; }

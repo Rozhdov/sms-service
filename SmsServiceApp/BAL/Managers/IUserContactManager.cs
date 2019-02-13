@@ -10,17 +10,22 @@ namespace WebCustomerApp.Managers
     {
         IEnumerable<ContactListViewModel> GetUserContacts(string AppUserId);
         IEnumerable<ContactListViewModel> GetUserContacts(string AppUserId, int Num);
-        SelectList GetAvailableContactGroups(string AppUserId);
+
+        EditContactViewModel FindContact(string AppUserId, int UserContactId);
 
         IEnumerable<ContactGroupListViewModel> GetContactGroups(string AppUserId);
         IEnumerable<ContactGroupListViewModel> GetContactGroups(string AppUserId, int Num);
+        SelectList GetAvailableContactGroups(string AppUserId);
+        EditContactGroupViewModel FindContactGroup(string AppUserId, int UserContactGroupId);
 
         bool AddContactGroup(string AppUserId, AddContactGroupViewModel ContactGroup);
+        bool EditContactGroup(string AppUserId, EditContactGroupViewModel ContactGroup);
 
         bool AddUserContact(string AppUserId, AddContactViewModel Contact);
-        bool EditUserContact(string AppUserId, AddContactViewModel Contact);
+        bool EditUserContact(string AppUserId, EditContactViewModel Contact);
 
-        bool RemoveUserContact(string AppUserId, string UserContactPhone);
+        bool RemoveUserContact(string AppUserId, int UserContactId);
+        bool RemoveContactGroup(string AppUserId, int UserContactGroupId);
 
 
     }

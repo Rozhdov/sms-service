@@ -43,6 +43,7 @@
             <th scope="col">Phone number</th>
             <th scope="col">Name</th>
             <th scope="col">Groups</th>
+            <th scope="col">Controls</th>
         </tr>
     </thead>
     <tbody>
@@ -59,6 +60,8 @@
                 <th>@iter.Name</th>
             }
             <th>@iter.Groups</th>
+            <th><a class="btn btn-default btn-sm" role="button" href="/Contacts/RemoveContact?UserContactId=@iter.Id">Delete</a>
+            <a class="btn btn-default btn-sm" role="button" href="/Contacts/ChangeContact?UserContactId=@iter.Id">Edit</a></th>
         </tr>
         }
     </tbody>   
