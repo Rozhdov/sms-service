@@ -17,8 +17,10 @@ namespace WebCustomerApp.Models.ContactsViewModels
         [Display(Name = "Name")]
         public string Name { get; set; }
 
-        [Display(Name = "Roles")]
+        [Display(Name = "Groups")]
         public IEnumerable<string> Groups { get; set; }
+
+
     }
 
 }
