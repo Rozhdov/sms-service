@@ -8,25 +8,28 @@ namespace WebCustomerApp.Managers
 {
     public interface IUserContactManager : IDisposable
     {
-        IEnumerable<ContactListViewModel> GetUserContacts(string AppUserId);
-        IEnumerable<ContactListViewModel> GetUserContacts(string AppUserId, int Num);
-
-        EditContactViewModel FindContact(string AppUserId, int UserContactId);
+        //EditContactViewModel FindContact(string AppUserId, int UserContactId);
 
         IEnumerable<ContactGroupListViewModel> GetContactGroups(string AppUserId);
         IEnumerable<ContactGroupListViewModel> GetContactGroups(string AppUserId, int Num);
-        SelectList GetAvailableContactGroups(string AppUserId);
         EditContactGroupViewModel FindContactGroup(string AppUserId, int UserContactGroupId);
 
         bool AddContactGroup(string AppUserId, AddContactGroupViewModel ContactGroup);
         bool EditContactGroup(string AppUserId, EditContactGroupViewModel ContactGroup);
 
-        bool AddUserContact(string AppUserId, AddContactViewModel Contact);
-        bool EditUserContact(string AppUserId, EditContactViewModel Contact);
+
+
+
 
         bool RemoveUserContact(string AppUserId, int UserContactId);
         bool RemoveContactGroup(string AppUserId, int UserContactGroupId);
 
+        bool AddContact(string AppUserId, ContactViewModel Contact);
+        bool EditContact(string AppUserId, ContactViewModel Contact);
+
+        IEnumerable<ContactViewModel> GetContacts(string AppUserId, int Num);
+        ContactViewModel FindContact(string AppUserId, int UserContactId);
+        ContactViewModel GetEmptyContact(string AppUserId);
 
     }
 }

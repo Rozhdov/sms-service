@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebCustomerApp.Models.ContactsViewModels
 {
@@ -17,8 +18,11 @@ namespace WebCustomerApp.Models.ContactsViewModels
         [Display(Name = "Name")]
         public string Name { get; set; }
 
-        [Display(Name = "Roles")]
-        public IEnumerable<string> Groups { get; set; }
+        [Display(Name = "Groups")]
+        public int[] GroupIds { get; set; }
+
+        [Display(Name = "Groups")]
+        public MultiSelectList Groups { get; set; }
     }
 
 }

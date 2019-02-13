@@ -8,6 +8,9 @@ namespace WebCustomerApp.Models.ContactsViewModels
 {
     public class EditContactViewModel
     {
+        [Display(Name = "Id")]
+        public int Id { get; set; }
+
         [Required]
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Phone number")]
@@ -18,7 +21,10 @@ namespace WebCustomerApp.Models.ContactsViewModels
         public string Name { get; set; }
 
         [Display(Name = "Groups")]
-        public IEnumerable<string> Groups { get; set; }
+        public int[] GroupIds { get; set; }
+
+        [Display(Name = "Groups")]
+        public MultiSelectList Groups { get; set; }
 
 
     }

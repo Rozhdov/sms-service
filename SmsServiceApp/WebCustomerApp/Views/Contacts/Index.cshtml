@@ -1,5 +1,5 @@
 ﻿@using WebCustomerApp.Models.ContactsViewModels
-@model AddContactViewModel
+@model ContactViewModel
 
 @{
     ViewData["Title"] = "Contacts";
@@ -24,49 +24,23 @@
     </div>
     <div class="row">
         <div class="form-group col-md-12">
-            <label asp-for="Groups"></label>
-            <select asp-for="Groups" asp-items="ViewBag.Groups" multiple class="form-control"></select>
+            <label asp-for="GroupIds"></label>
+            <select asp-for="GroupIds" asp-items="Model.Groups" multiple class="form-control"></select>
         </div>
     </div>
     <button type="submit" class="btn btn-default">Add contact</button>
-    <a class="btn btn-default" role="button" asp-action="Groups" asp-controller="Contacts">Manage groups</a>            
+    <a class="btn btn-default" role="button" asp-action="Groups" asp-controller="Contacts">Manage groups</a>
 </form>
 
 
 <h4>Contact List</h4>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Phone number</th>
-            <th scope="col">Name</th>
-            <th scope="col">Groups</th>
-            <th scope="col">Controls</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(ContactListViewModel iter in ViewBag.Contacts)
-        {
-        <tr>
-            <th scope="row">@iter.PhoneNumber</th>
-            @if (iter.Name == "" || iter.Name == null)
-            {
-                <th>Unnamed contact</th>
-            }
-            else
-            {
-                <th>@iter.Name</th>
-            }
-            <th>@iter.Groups</th>
-            <th>
-                <a class="btn btn-default btn-sm" role="button" asp-action="RemoveContact" asp-controller="Contacts" asp-route-UserContactId="@iter.Id">Delete</a>
-                <a class="btn btn-default btn-sm" role="button" asp-action="ChangeContact" asp-controller="Contacts" asp-route-UserContactId="@iter.Id">Edit</a>
-            </th>
-        </tr>
-        }
-    </tbody>   
-</table>
 
+@foreach (ContactViewModel iter in ViewBag.Contacts)
+{
+    { await Html.RenderPartialAsync("Contact", iter); }
+
+}
 
 
 @section Scripts {

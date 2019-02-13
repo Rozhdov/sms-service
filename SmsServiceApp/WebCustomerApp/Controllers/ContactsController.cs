@@ -32,23 +32,24 @@ namespace WebApp.Controllers
         public IActionResult Index()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ViewBag.Contacts = _contactManager.GetUserContacts(userId, 20);
-            ViewBag.Groups = _contactManager.GetAvailableContactGroups(userId);
-            return View();
+            ViewBag.Contacts = _contactManager.GetContacts(userId, 20);
+            var newContact = _contactManager.GetEmptyContact(userId);
+            return View(newContact);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(AddContactViewModel newContact)
+        public IActionResult Index(ContactViewModel newContact)
         {
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                bool result = _contactManager.AddUserContact(userId, newContact);
+                bool result = _contactManager.AddContact(userId, newContact);
                 if(!result)
                 {
                     ModelState.AddModelError(string.Empty, "Adding failed");
-                    return RedirectToAction("Index", "Contacts");
+                    ViewBag.Contacts = _contactManager.GetContacts(userId, 20);
+                    return View(newContact);
                 }
                 else
                 {
@@ -78,7 +79,6 @@ namespace WebApp.Controllers
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var contact = _contactManager.FindContact(userId, UserContactId);
-            ViewBag.Groups = _contactManager.GetAvailableContactGroups(userId);
             if (contact == null)
             {
                 ModelState.AddModelError(string.Empty, "Modify failed");
@@ -92,16 +92,37 @@ namespace WebApp.Controllers
         
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public IActionResult ChangeContact(EditContactViewModel UserContact)
+        public IActionResult ChangeContact(ContactViewModel UserContact)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var result = _contactManager.EditUserContact(userId, UserContact);
+            var result = _contactManager.EditContact(userId, UserContact);
             if (ModelState.IsValid)
             {
                 if (result == false)
                 {
                     ModelState.AddModelError(string.Empty, "Modify failed");
                     return View(UserContact);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Contacts"); ;
+                }
+            }
+            return RedirectToAction("Index", "Contacts");
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public IActionResult Contact(ContactViewModel UserContact)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var result = _contactManager.EditContact(userId, UserContact);
+            if (ModelState.IsValid)
+            {
+                if (result == false)
+                {
+                    ModelState.AddModelError(string.Empty, "Modify failed");
+                    return RedirectToAction("Index", "Contacts");
                 }
                 else
                 {
