@@ -7,6 +7,10 @@
 
   <ItemGroup>
     <PackageReference Include="bootstrap-select" Version="1.13.5" />
+    <PackageReference Include="bootstrap.less" Version="3.4.1" />
+    <PackageReference Include="Bootstrap.v3.Datetimepicker" Version="4.17.45" />
+    <PackageReference Include="Bootstrap.v3.Datetimepicker.CSS" Version="4.17.45" />
+    <PackageReference Include="jQuery" Version="3.3.1" />
   </ItemGroup>
 
   <ItemGroup>

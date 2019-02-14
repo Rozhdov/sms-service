@@ -12,13 +12,10 @@ namespace WebCustomerApp.Managers
 
         IEnumerable<GroupViewModel> GetContactGroups(string AppUserId, int Num);
         GroupViewModel FindContactGroup(string AppUserId, int UserContactGroupId);
+        //MultiSelectList GetAvailableGroups(string AppUserId);
 
         bool AddContactGroup(string AppUserId, GroupViewModel ContactGroup);
         bool EditContactGroup(string AppUserId, GroupViewModel ContactGroup);
-
-
-
-
 
         bool RemoveUserContact(string AppUserId, int UserContactId);
         bool RemoveContactGroup(string AppUserId, int UserContactGroupId);

@@ -1,0 +1,30 @@
+﻿@using WebCustomerApp.Models.MailingViewModels
+@model MailingViewModel
+
+@{
+    ViewData["Title"] = "Contacts";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Index" asp-controller="Mailings" method="post" asp-antiforgery="true">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Title">Title</label>
+        <input asp-for="Title" type="text" class="form-control" placeholder="Title of mailing" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Text">Message</label>
+        <textarea asp-for="Text" class="form-control" placeholder="Message"></textarea>
+        <span asp-validation-for="Text" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="GroupIds"></label>
+        <select asp-for="GroupIds" asp-items="Model.Groups" multiple class="form-control"></select>
+    </div>
+    <button type="submit" class="btn btn-default">Add contact</button>
+    <a class="btn btn-default" role="button" asp-action="Groups" asp-controller="Contacts">Manage groups</a>
+</form>
+
+

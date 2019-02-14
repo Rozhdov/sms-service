@@ -44,6 +44,7 @@ namespace WebCustomerApp
               .AddDefaultTokenProviders();
 
             services.AddScoped<IUserContactManager, UserContactManager>();
+            services.AddScoped<IMailingManager, MailingManager>();
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();

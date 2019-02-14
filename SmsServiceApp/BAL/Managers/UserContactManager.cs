@@ -331,6 +331,18 @@ namespace WebCustomerApp.Managers
             result.Groups = new MultiSelectList(availableGroups, "Id", "Group");
             return result;
         }
+
+        //public MultiSelectList GetAvailableGroups(string AppUserId)
+        //{
+        //    if(AppUserId == null)
+        //        return null;
+        //    var availableGroups = from ucg in db.UserContactGroups
+        //                          where ucg.UserId == AppUserId
+        //                          select ucg;
+
+        //    var result = new MultiSelectList(availableGroups, "Id", "Group");
+        //    return result;
+        //}
     }
 }
 
