@@ -42,7 +42,7 @@ namespace WebCustomerApp.Managers
             return true;
         }
 
-        public bool AddContactGroup(string AppUserId, AddContactGroupViewModel ContactGroup)
+        public bool AddContactGroup(string AppUserId, GroupViewModel ContactGroup)
         {
             if (AppUserId == null || ContactGroup.Group == null)
                 return false;
@@ -62,7 +62,7 @@ namespace WebCustomerApp.Managers
             return true;
         }
 
-        public IEnumerable<ContactGroupListViewModel> GetContactGroups(string AppUserId)
+        public IEnumerable<GroupViewModel> GetContactGroups(string AppUserId)
         {
             if (AppUserId == null)
             {
@@ -71,10 +71,10 @@ namespace WebCustomerApp.Managers
             var groups = from g in db.UserContactGroups
                          where g.UserId == AppUserId
                          select g;
-            var result = new List<ContactGroupListViewModel>();
+            var result = new List<GroupViewModel>();
             foreach (var iter in groups)
             {
-                result.Add(new ContactGroupListViewModel()
+                result.Add(new GroupViewModel()
                 {
                     Id = iter.Id,
                     Group = iter.Group,
@@ -85,7 +85,7 @@ namespace WebCustomerApp.Managers
 
         }
 
-        public IEnumerable<ContactGroupListViewModel> GetContactGroups(string AppUserId, int Num)
+        public IEnumerable<GroupViewModel> GetContactGroups(string AppUserId, int Num)
         {
             if (AppUserId == null)
             {
@@ -94,10 +94,10 @@ namespace WebCustomerApp.Managers
             var groups = (from g in db.UserContactGroups
                           where g.UserId == AppUserId
                           select g).Take(Num);
-            var result = new List<ContactGroupListViewModel>();
+            var result = new List<GroupViewModel>();
             foreach (var iter in groups)
             {
-                result.Add(new ContactGroupListViewModel()
+                result.Add(new GroupViewModel()
                 {
                     Id = iter.Id,
                     Group = iter.Group,
@@ -107,9 +107,10 @@ namespace WebCustomerApp.Managers
             return result;
         }
 
-        public bool EditContactGroup(string AppUserId, EditContactGroupViewModel ContactGroup)
+        public bool EditContactGroup(string AppUserId, GroupViewModel ContactGroup)
         {
-            if (AppUserId == null || ContactGroup.Group == null || db.UserContactGroups.Any(ucg => ucg.Group == ContactGroup.Group))
+            if (AppUserId == null || ContactGroup.Group == null || db.UserContactGroups.Any(
+                ucg => ucg.Group == ContactGroup.Group && ucg.Id != ContactGroup.Id ))
                 return false;
 
             var updatedContactGroup = (from cg in db.UserContactGroups
@@ -138,7 +139,7 @@ namespace WebCustomerApp.Managers
             return true;
         }
 
-        public EditContactGroupViewModel FindContactGroup(string AppUserId, int UserContactGroupId)
+        public GroupViewModel FindContactGroup(string AppUserId, int UserContactGroupId)
         {
             if (AppUserId == null)
                 return null;
@@ -149,7 +150,7 @@ namespace WebCustomerApp.Managers
                 return null;
             else
             {
-                var result = new EditContactGroupViewModel()
+                var result = new GroupViewModel()
                 {
                     Group = group.Group,
                     Description = group.Description,
@@ -217,7 +218,7 @@ namespace WebCustomerApp.Managers
             var temp = (from uc in db.UserContacts
                         where uc.PhoneNumber == Contact.PhoneNumber && uc.UserId == AppUserId && uc.Id != Contact.Id
                         select uc).FirstOrDefault();
-            if (temp == null)
+            if (temp != null)
                 return false;
 
             updatedContact.Name = Contact.Name;

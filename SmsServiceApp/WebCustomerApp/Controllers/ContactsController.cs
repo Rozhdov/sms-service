@@ -73,44 +73,7 @@ namespace WebApp.Controllers
                 return RedirectToAction("Index", "Contacts");
             }
         }
-
-        [HttpGet]
-        public IActionResult ChangeContact(int UserContactId)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var contact = _contactManager.FindContact(userId, UserContactId);
-            if (contact == null)
-            {
-                ModelState.AddModelError(string.Empty, "Modify failed");
-                return RedirectToAction("Index", "Contacts");
-            }
-            else
-            {
-                return View(contact);
-            }
-        }
-        
-        [HttpPost]
-        [AutoValidateAntiforgeryToken]
-        public IActionResult ChangeContact(ContactViewModel UserContact)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var result = _contactManager.EditContact(userId, UserContact);
-            if (ModelState.IsValid)
-            {
-                if (result == false)
-                {
-                    ModelState.AddModelError(string.Empty, "Modify failed");
-                    return View(UserContact);
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Contacts"); ;
-                }
-            }
-            return RedirectToAction("Index", "Contacts");
-        }
-
+              
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public IActionResult Contact(ContactViewModel UserContact)
@@ -143,7 +106,7 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Groups(AddContactGroupViewModel newGroup)
+        public IActionResult Groups(GroupViewModel newGroup)
         {
             if (ModelState.IsValid)
             {
@@ -177,27 +140,9 @@ namespace WebApp.Controllers
             }
         }
 
-
-        [HttpGet]
-        public IActionResult ChangeContactGroup(int UserContactGroupId)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var group = _contactManager.FindContactGroup(userId, UserContactGroupId);
-            if (group == null)
-            {
-                ModelState.AddModelError(string.Empty, "Modify failed");
-                return RedirectToAction("Groups", "Contacts");
-            }
-            else
-            {
-                return View(group);
-            }
-        }
-
-
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public IActionResult ChangeContactGroup(EditContactGroupViewModel UserContactGroup)
+        public IActionResult Group(GroupViewModel UserContactGroup)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var result = _contactManager.EditContactGroup(userId, UserContactGroup);
@@ -206,16 +151,15 @@ namespace WebApp.Controllers
                 if (result == false)
                 {
                     ModelState.AddModelError(string.Empty, "Modify failed");
-                    return View(UserContactGroup);
+                    return RedirectToAction("Groups", "Contacts");
                 }
                 else
                 {
-                    return RedirectToAction("Groups", "Contacts"); ;
+                    return RedirectToAction("Groups", "Contacts");
                 }
             }
             return RedirectToAction("Groups", "Contacts");
         }
-
 
     }
 }

@@ -1,5 +1,5 @@
 ﻿@using WebCustomerApp.Models.ContactsViewModels
-@model AddContactGroupViewModel
+@model GroupViewModel
 
 @{
     ViewData["Title"] = "Groups";
@@ -10,8 +10,6 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Groups" asp-controller="Contacts" method="post" asp-antiforgery="true">
-            <h4>Create a new Group</h4>
-            <hr />
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Group"></label>
@@ -28,35 +26,15 @@
     </div>
 </div>
 
+
+<hr />
 <h4>Group list</h4>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Group</th>
-            <th scope="col">Description</th>
-            <th scope="col">Controls</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (ContactGroupListViewModel iter in ViewBag.Groups)
-        {
-        <tr>
-            <th scope="row">@iter.Group</th>
-            @if (iter.Description == "" || iter.Description == null)
-            {
-                <th>No description</th>
-            }
-            else
-            {
-                <th>@iter.Description</th>
-            }
-            <th><a class="btn btn-default btn-sm" role="button" href="/Contacts/RemoveContactGroup?ContactGroupId=@iter.Id">Delete</a>
-            <a class="btn btn-default btn-sm" role="button" href="/Contacts/ChangeContactGroup?UserContactGroupId=@iter.Id">Edit</a></th>
-        </tr>
-        }
-    </tbody>
-</table>
+
+@foreach (GroupViewModel iter in ViewBag.Groups)
+{
+    { await Html.RenderPartialAsync("Group", iter); }
+}
 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
