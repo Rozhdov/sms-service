@@ -43,8 +43,8 @@ namespace WebCustomerApp
             }).AddEntityFrameworkStores<ApplicationDbContext>()
               .AddDefaultTokenProviders();
 
-            services.AddScoped<IUserContactManager, UserContactManager>();
-            services.AddScoped<IMailingManager, MailingManager>();
+            services.AddTransient<IUserContactManager, UserContactManager>();
+            services.AddTransient<IMailingManager, MailingManager>();
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();

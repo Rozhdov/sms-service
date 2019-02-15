@@ -7,7 +7,7 @@ using WebCustomerApp.Data;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
+using System.Threading.Tasks;
 namespace WebCustomerApp.Managers
 {
     // ToDo: remade LINQ queries with React Framework or PLINQ for async
@@ -27,28 +27,28 @@ namespace WebCustomerApp.Managers
             db.Dispose();
         }
 
-        public bool RemoveUserContact(string AppUserId, int UserContactId)
+        async public Task<bool> RemoveUserContact(string AppUserId, int UserContactId)
         {
             if (AppUserId == null)
                 return false;
 
-            UserContact userContact = (from uc in db.UserContacts
+            UserContact userContact = await (from uc in db.UserContacts
                                        where uc.Id == UserContactId && uc.UserId == AppUserId
-                                       select uc).FirstOrDefault();
+                                       select uc).FirstOrDefaultAsync();
             if (userContact == null)
                 return false;
             db.UserContacts.Remove(userContact);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             return true;
         }
 
-        public bool AddContactGroup(string AppUserId, GroupViewModel ContactGroup)
+        async public Task<bool> AddContactGroup(string AppUserId, GroupViewModel ContactGroup)
         {
             if (AppUserId == null || ContactGroup.Group == null)
                 return false;
-            var temp = (from ucg in db.UserContactGroups
+            var temp = await (from ucg in db.UserContactGroups
                         where ucg.Group == ContactGroup.Group && ucg.UserId == AppUserId
-                        select ucg).FirstOrDefault();
+                        select ucg).FirstOrDefaultAsync();
             if (temp != null)
                 return false;
             var newGroup = new UserContactGroup()
@@ -57,43 +57,21 @@ namespace WebCustomerApp.Managers
                 Group = ContactGroup.Group,
                 Description = ContactGroup.Description
             };
-            db.UserContactGroups.Add(newGroup);
-            db.SaveChanges();
+            await db.UserContactGroups.AddAsync(newGroup);
+            await db.SaveChangesAsync();
             return true;
         }
 
-        public IEnumerable<GroupViewModel> GetContactGroups(string AppUserId)
+
+        async public Task<IEnumerable<GroupViewModel>> GetContactGroups(string AppUserId, int Num)
         {
             if (AppUserId == null)
             {
                 return null;
             }
-            var groups = from g in db.UserContactGroups
-                         where g.UserId == AppUserId
-                         select g;
-            var result = new List<GroupViewModel>();
-            foreach (var iter in groups)
-            {
-                result.Add(new GroupViewModel()
-                {
-                    Id = iter.Id,
-                    Group = iter.Group,
-                    Description = iter.Description
-                });
-            }
-            return result;
-
-        }
-
-        public IEnumerable<GroupViewModel> GetContactGroups(string AppUserId, int Num)
-        {
-            if (AppUserId == null)
-            {
-                return null;
-            }
-            var groups = (from g in db.UserContactGroups
+            var groups = await (from g in db.UserContactGroups
                           where g.UserId == AppUserId
-                          select g).Take(Num);
+                          select g).Take(Num).ToListAsync();
             var result = new List<GroupViewModel>();
             foreach (var iter in groups)
             {
@@ -107,14 +85,21 @@ namespace WebCustomerApp.Managers
             return result;
         }
 
-        public bool EditContactGroup(string AppUserId, GroupViewModel ContactGroup)
+        async public Task<bool> EditContactGroup(string AppUserId, GroupViewModel ContactGroup)
         {
-            if (AppUserId == null || ContactGroup.Group == null || db.UserContactGroups.Any(
-                ucg => ucg.Group == ContactGroup.Group && ucg.Id != ContactGroup.Id ))
+            if (AppUserId == null || ContactGroup.Group == null)
                 return false;
 
-            var updatedContactGroup = (from cg in db.UserContactGroups
-                                       where cg.UserId == AppUserId && cg.Id == ContactGroup.Id
+            var contactGroups = await (from cg in db.UserContactGroups
+                                       where cg.UserId == AppUserId
+                                       select cg).ToListAsync();
+
+            // Check for duplicate group title
+            if (contactGroups.Any(cg => cg.Group == ContactGroup.Group && cg.Id != ContactGroup.Id))
+                return false;
+
+            var updatedContactGroup = (from cg in contactGroups
+                                       where cg.Id == ContactGroup.Id
                                        select cg).FirstOrDefault();
 
             if (updatedContactGroup == null)
@@ -123,29 +108,29 @@ namespace WebCustomerApp.Managers
             updatedContactGroup.Group = ContactGroup.Group;
             updatedContactGroup.Description = ContactGroup.Description;
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             return true;
         }
 
-        public bool RemoveContactGroup(string AppUserId, int UserContactGroupId)
+        async public Task<bool> RemoveContactGroup(string AppUserId, int UserContactGroupId)
         {
             if (AppUserId == null)
                 return false;
-            var ContactGroupToRemove = db.UserContactGroups.Find(UserContactGroupId);
+            var ContactGroupToRemove = await db.UserContactGroups.FindAsync(UserContactGroupId);
             if (ContactGroupToRemove == null || ContactGroupToRemove.UserId != AppUserId)
                 return false;
             db.UserContactGroups.Remove(ContactGroupToRemove);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             return true;
         }
 
-        public GroupViewModel FindContactGroup(string AppUserId, int UserContactGroupId)
+        async public Task<GroupViewModel> FindContactGroup(string AppUserId, int UserContactGroupId)
         {
             if (AppUserId == null)
                 return null;
-            var group = (from uc in db.UserContactGroups
+            var group = await (from uc in db.UserContactGroups
                          where uc.Id == UserContactGroupId && uc.UserId == AppUserId
-                         select uc).FirstOrDefault();
+                         select uc).FirstOrDefaultAsync();
             if (group == null)
                 return null;
             else
@@ -160,16 +145,16 @@ namespace WebCustomerApp.Managers
             }
         }
 
-        public bool AddContact(string AppUserId, ContactViewModel Contact)
+        async public Task<bool> AddContact(string AppUserId, ContactViewModel Contact)
         {
             // check on required fields
             if (AppUserId == null || Contact.PhoneNumber == null)
                 return false;
             // check for duplicate
-            var check = from uc in db.UserContacts
+            var check = await (from uc in db.UserContacts
                         where uc.PhoneNumber == Contact.PhoneNumber && uc.UserId == AppUserId
-                        select uc;
-            if (check.Any())
+                        select uc).FirstOrDefaultAsync();
+            if (check != null)
                 return false;
             var newContact = new UserContact()
             {
@@ -177,16 +162,21 @@ namespace WebCustomerApp.Managers
                 PhoneNumber = Contact.PhoneNumber,
                 Name = Contact.Name
             };
-            db.UserContacts.Add(newContact);
+            await db.UserContacts.AddAsync(newContact);
 
             // adding contact to selected groups
             if (Contact.GroupIds != null)
+            {
+                var groups = await (from ucg in db.UserContactGroups
+                                    where ucg.UserId == AppUserId
+                                    select ucg).ToListAsync();
+
                 foreach (int iter in Contact.GroupIds)
                 {
                     // check, if group exist
-                    var group = (from ucg in db.UserContactGroups
-                                 where ucg.Id == iter && ucg.UserId == AppUserId
-                                 select ucg).FirstOrDefault();
+                    var group = (from g in groups
+                                 where g.Id == iter
+                                 select g).FirstOrDefault();
                     if (group != null)
                     {
                         ContactGroup cg = new ContactGroup()
@@ -194,29 +184,35 @@ namespace WebCustomerApp.Managers
                             UserContact = newContact,
                             UserContactGroup = group
                         };
-                        db.ContactGroups.Add(cg);
+                        await db.ContactGroups.AddAsync(cg);
                     }
                 }
-            db.SaveChanges();
+            }
+            await db.SaveChangesAsync();
             return true;
         }
 
-        public bool EditContact(string AppUserId, ContactViewModel Contact)
+        async public Task<bool> EditContact(string AppUserId, ContactViewModel Contact)
         {
             // Check for required fields
             if (AppUserId == null || Contact.PhoneNumber == null)
                 return false;
 
+            var userContacts = await (from uc in db.UserContacts
+                                      where uc.UserId == AppUserId
+                                      select uc).ToListAsync();
+
             // Check of existance and authority
-            var updatedContact = (from uc in db.UserContacts.Include(uc => uc.ContactGroups)
-                                  where uc.Id == Contact.Id && uc.UserId == AppUserId
+            var updatedContact = (from uc in userContacts
+                                  where uc.Id == Contact.Id
                                   select uc).FirstOrDefault();
+
             if (updatedContact == null)
                 return false;
 
             // Check for duplicate phone number
-            var temp = (from uc in db.UserContacts
-                        where uc.PhoneNumber == Contact.PhoneNumber && uc.UserId == AppUserId && uc.Id != Contact.Id
+            var temp = (from uc in userContacts
+                        where uc.PhoneNumber == Contact.PhoneNumber && uc.Id != Contact.Id
                         select uc).FirstOrDefault();
             if (temp != null)
                 return false;
@@ -225,23 +221,26 @@ namespace WebCustomerApp.Managers
             updatedContact.PhoneNumber = Contact.PhoneNumber;
 
             // Removing contact from every group 
-            var groups = from cg in db.ContactGroups
-                         where cg.UserContact == updatedContact
-                         select cg;
-            foreach (var iter in groups)
+            var contactGroups = await (from uc in db.ContactGroups
+                                       where uc.UserContactId == updatedContact.Id
+                                       select uc).ToListAsync();
+            foreach (var iter in contactGroups)
             {
                 updatedContact.ContactGroups.Remove(iter);
             }
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             // Adding contact to selected groups
             if (Contact.GroupIds != null)
             {
+                var groups = await (from ucg in db.UserContactGroups
+                              where ucg.UserId == AppUserId
+                              select ucg).ToListAsync();
                 foreach (int iter in Contact.GroupIds)
                 {
                     // check, if group exist
-                    var group = (from ucg in db.UserContactGroups
-                                 where ucg.Id == iter && ucg.UserId == AppUserId
+                    var group = (from ucg in groups
+                                 where ucg.Id == iter
                                  select ucg).FirstOrDefault();
                     if (group != null)
                     {
@@ -254,18 +253,22 @@ namespace WebCustomerApp.Managers
                     }
                 }
             }
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             return true;
         }
 
-        public IEnumerable<ContactViewModel> GetContacts(string AppUserId, int Num)
+        async public Task<IEnumerable<ContactViewModel>> GetContacts(string AppUserId, int Num)
         {
-            var contacts = (from uc in db.UserContacts
+            var contacts = await (from uc in db.UserContacts
                             .Include(uc => uc.ContactGroups)
                             .ThenInclude(cg => cg.UserContactGroup)
                             where uc.UserId == AppUserId
-                            select uc).Take(Num);
+                            select uc).Take(Num).ToListAsync();
             var result = new List<ContactViewModel>();
+
+            var availableGroups = await (from ucg in db.UserContactGroups
+                                  where ucg.UserId == AppUserId
+                                  select ucg).ToListAsync();
             foreach (var iter in contacts)
             {
                 result.Add(new ContactViewModel()
@@ -278,24 +281,21 @@ namespace WebCustomerApp.Managers
                 var selectedGroups = from cg in iter.ContactGroups
                                      select cg.UserContactGroup.Id;
 
-                var availableGroups = from ucg in db.UserContactGroups
-                                      where ucg.UserId == AppUserId
-                                      select ucg;
                 result.Last().Groups = new MultiSelectList(availableGroups, "Id", "Group", selectedGroups);
             }
             return result;
         }
 
-        public ContactViewModel FindContact(string AppUserId, int UserContactId)
+        async public Task<ContactViewModel> FindContact(string AppUserId, int UserContactId)
         {
             if (AppUserId == null)
                 return null;
 
-            var contact = (from uc in db.UserContacts
+            var contact = await (from uc in db.UserContacts
                            .Include(uc => uc.ContactGroups)
                            .ThenInclude(cg => cg.UserContactGroup)
                            where uc.Id == UserContactId && uc.UserId == AppUserId
-                           select uc).FirstOrDefault();
+                           select uc).FirstOrDefaultAsync();
             if (contact == null)
                 return null;
             else
@@ -310,39 +310,28 @@ namespace WebCustomerApp.Managers
                 var selectedGroups = from cg in contact.ContactGroups
                                      select cg.UserContactGroup.Id;
 
-                var availableGroups = from ucg in db.UserContactGroups
+                var availableGroups = await (from ucg in db.UserContactGroups
                                       where ucg.UserId == AppUserId
-                                      select ucg;
+                                      select ucg).ToListAsync();
 
                 result.Groups = new MultiSelectList(availableGroups, "Id", "Group", selectedGroups);
                 return result;
             }
         }
 
-        public ContactViewModel GetEmptyContact(string AppUserId)
+        async public Task<ContactViewModel> GetEmptyContact(string AppUserId)
         {
             if (AppUserId == null)
                 return null;
             var result = new ContactViewModel();
-            var availableGroups = from ucg in db.UserContactGroups
+            var availableGroups = await (from ucg in db.UserContactGroups
                                   where ucg.UserId == AppUserId
-                                  select ucg;
+                                  select ucg).ToListAsync();
 
             result.Groups = new MultiSelectList(availableGroups, "Id", "Group");
             return result;
         }
 
-        //public MultiSelectList GetAvailableGroups(string AppUserId)
-        //{
-        //    if(AppUserId == null)
-        //        return null;
-        //    var availableGroups = from ucg in db.UserContactGroups
-        //                          where ucg.UserId == AppUserId
-        //                          select ucg;
-
-        //    var result = new MultiSelectList(availableGroups, "Id", "Group");
-        //    return result;
-        //}
     }
 }
 

@@ -29,26 +29,26 @@ namespace WebApp.Controllers
         
         // GET: /<controller>/
         [HttpGet]
-        public IActionResult Index()
+        async public Task<IActionResult> Index()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ViewBag.Contacts = _contactManager.GetContacts(userId, 20);
-            var newContact = _contactManager.GetEmptyContact(userId);
+            ViewBag.Contacts = await _contactManager.GetContacts(userId, 20);
+            var newContact = await _contactManager.GetEmptyContact(userId);
             return View(newContact);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(ContactViewModel newContact)
+        async public Task<IActionResult> Index(ContactViewModel newContact)
         {
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                bool result = _contactManager.AddContact(userId, newContact);
+                bool result = await _contactManager.AddContact(userId, newContact);
                 if(!result)
                 {
                     ModelState.AddModelError(string.Empty, "Adding failed");
-                    ViewBag.Contacts = _contactManager.GetContacts(userId, 20);
+                    ViewBag.Contacts = await _contactManager.GetContacts(userId, 20);
                     return View(newContact);
                 }
                 else
@@ -59,10 +59,10 @@ namespace WebApp.Controllers
             return View();
         }
 
-        public IActionResult RemoveContact(int UserContactId)
+        async public Task<IActionResult> RemoveContact(int UserContactId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            bool result = _contactManager.RemoveUserContact(userId, UserContactId);
+            bool result = await _contactManager.RemoveUserContact(userId, UserContactId);
             if(!result)
             {
                 ModelState.AddModelError(string.Empty, "Delete failed");
@@ -76,10 +76,10 @@ namespace WebApp.Controllers
               
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public IActionResult Contact(ContactViewModel UserContact)
+        async public Task<IActionResult> Contact(ContactViewModel UserContact)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var result = _contactManager.EditContact(userId, UserContact);
+            var result = await _contactManager.EditContact(userId, UserContact);
             if (ModelState.IsValid)
             {
                 if (result == false)
@@ -96,22 +96,21 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Groups()
+        async public Task<IActionResult> Groups()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ViewBag.Groups = _contactManager.GetContactGroups(userId, 20);
-            var temp = _contactManager.GetContactGroups(userId, 20);
+            ViewBag.Groups = await _contactManager.GetContactGroups(userId, 20);
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Groups(GroupViewModel newGroup)
+        async public Task<IActionResult> Groups(GroupViewModel newGroup)
         {
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                bool result = _contactManager.AddContactGroup(userId, newGroup);
+                bool result = await _contactManager.AddContactGroup(userId, newGroup);
                 if (!result)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid contact");
@@ -125,10 +124,10 @@ namespace WebApp.Controllers
             return View();
         }
 
-        public IActionResult RemoveContactGroup(int ContactGroupId)
+        async public Task<IActionResult> RemoveContactGroup(int ContactGroupId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            bool result = _contactManager.RemoveContactGroup(userId, ContactGroupId);
+            bool result = await _contactManager.RemoveContactGroup(userId, ContactGroupId);
             if (!result)
             {
                 ModelState.AddModelError(string.Empty, "Delete failed");
@@ -142,10 +141,10 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public IActionResult Group(GroupViewModel UserContactGroup)
+        async public Task<IActionResult> Group(GroupViewModel UserContactGroup)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var result = _contactManager.EditContactGroup(userId, UserContactGroup);
+            var result = await _contactManager.EditContactGroup(userId, UserContactGroup);
             if (ModelState.IsValid)
             {
                 if (result == false)

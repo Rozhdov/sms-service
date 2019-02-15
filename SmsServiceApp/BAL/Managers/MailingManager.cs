@@ -28,7 +28,7 @@ namespace WebCustomerApp.Managers
         async public Task<bool> AddMailing(string AppUserId, MailingViewModel Mailing)
         {
             // check on required fields
-            if (AppUserId == null || Mailing.Text == null || Mailing.GroupIds == null)
+            if (AppUserId == null || Mailing.Text == null || Mailing.GroupIds == null || Mailing.Times == null)
                 return false;
 
             // searchin for recievers
