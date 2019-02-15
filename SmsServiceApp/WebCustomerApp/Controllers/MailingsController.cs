@@ -26,22 +26,22 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        async public Task<IActionResult> Index()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ViewBag.Mailings = _mailingManager.GetMailings(userId, 20);
-            var newMailing = _mailingManager.GetEmptyMailing(userId);
+            ViewBag.Mailings = await _mailingManager.GetMailings(userId, 20);
+            var newMailing = await _mailingManager.GetEmptyMailing(userId);
             return View(newMailing);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(MailingViewModel NewMailing)
+        async public Task<IActionResult> Index(MailingViewModel NewMailing)
         {
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                bool result = _mailingManager.AddMailing(userId, NewMailing);
+                bool result = await _mailingManager.AddMailing(userId, NewMailing);
                 if (!result)
                 {
                     ModelState.AddModelError(string.Empty, "Adding failed");
@@ -55,10 +55,10 @@ namespace WebApp.Controllers
             return RedirectToAction("Index", "Mailings");
         }
 
-        public IActionResult Remove(int MailingId)
+        async public Task<IActionResult> Remove(int MailingId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            bool result = _mailingManager.RemoveMailing(userId, MailingId);
+            bool result = await _mailingManager.RemoveMailing(userId, MailingId);
             if (!result)
             {
                 ModelState.AddModelError(string.Empty, "Removal failed");
@@ -72,12 +72,12 @@ namespace WebApp.Controllers
         
 
         [HttpPost]
-        public IActionResult Mailing(MailingViewModel EditedMailing)
+        async public Task<IActionResult> Mailing(MailingViewModel EditedMailing)
         {
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                bool result = _mailingManager.EditMailing(userId, EditedMailing);
+                bool result = await _mailingManager.EditMailing(userId, EditedMailing);
                 if (!result)
                 {
                     ModelState.AddModelError(string.Empty, "Editing failed");

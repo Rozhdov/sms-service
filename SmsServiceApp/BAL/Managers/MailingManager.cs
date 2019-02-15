@@ -4,6 +4,7 @@ using System.Text;
 using WebCustomerApp.Models;
 using WebCustomerApp.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebCustomerApp.Models.MailingViewModels;
@@ -24,16 +25,16 @@ namespace WebCustomerApp.Managers
             db.Dispose();
         }
 
-        public bool AddMailing(string AppUserId, MailingViewModel Mailing)
+        async public Task<bool> AddMailing(string AppUserId, MailingViewModel Mailing)
         {
             // check on required fields
             if (AppUserId == null || Mailing.Text == null || Mailing.GroupIds == null)
                 return false;
 
             // searchin for recievers
-            var recievers = (from cg in db.ContactGroups
+            var recievers = await (from cg in db.ContactGroups
                             where Mailing.GroupIds.Contains(cg.UserContactGroupId)
-                            select cg.UserContact).Distinct();
+                            select cg.UserContact).Distinct().ToListAsync();
             if (!recievers.Any())
                 return false;
 
@@ -70,36 +71,36 @@ namespace WebCustomerApp.Managers
                 }
             }
 
-            db.Messages.AddRange(messages);
-            db.SaveChanges();
+            await db.Messages.AddRangeAsync(messages);
+            await db.SaveChangesAsync();
             return true;
         }
 
-        public bool EditMailing(string AppUserId, MailingViewModel Mailing)
+        async public Task<bool> EditMailing(string AppUserId, MailingViewModel Mailing)
         {
             if (AppUserId == null || Mailing.Text == null)
                 return false;
 
-            var editedMailing = (from m in db.Mailings
+            var editedMailing = await (from m in db.Mailings
                                  where m.SenderId == AppUserId && m.Id == Mailing.Id
-                                 select m).FirstOrDefault();
+                                 select m).FirstOrDefaultAsync();
 
             if (editedMailing == null)
                 return false;
 
             editedMailing.Text = Mailing.Text;
             editedMailing.Title = Mailing.Title;
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             return true;
         }
 
-        public MailingViewModel FindMailing(string AppUserId, int MailingId)
+        async public Task<MailingViewModel> FindMailing(string AppUserId, int MailingId)
         {
             if (AppUserId == null)
                 return null;
-            var mailing = (from m in db.Mailings
+            var mailing = await (from m in db.Mailings
                          where m.Id == MailingId && m.SenderId == AppUserId
-                         select m).FirstOrDefault();
+                         select m).FirstOrDefaultAsync();
             if (mailing == null)
                 return null;
             else
@@ -115,24 +116,24 @@ namespace WebCustomerApp.Managers
             }
         }
 
-        public MailingViewModel GetEmptyMailing(string AppUserId)
+        async public Task<MailingViewModel> GetEmptyMailing(string AppUserId)
         {
             if (AppUserId == null)
                 return null;
             var result = new MailingViewModel();
-            var availableGroups = from ucg in db.UserContactGroups
+            var availableGroups = await (from ucg in db.UserContactGroups
                                   where ucg.UserId == AppUserId
-                                  select ucg;
+                                  select ucg).ToListAsync();
 
             result.Groups = new MultiSelectList(availableGroups, "Id", "Group");
             return result;
         }
 
-        public IEnumerable<MailingViewModel> GetMailings(string AppUserId, int Num)
+        async public Task<IEnumerable<MailingViewModel>> GetMailings(string AppUserId, int Num)
         {
-            var mailings = (from m in db.Mailings
+            var mailings = await (from m in db.Mailings
                             where m.SenderId == AppUserId
-                            select m).Take(Num).OrderByDescending(m => m.DateOfCreation);
+                            select m).Take(Num).OrderByDescending(m => m.DateOfCreation).ToListAsync();
 
             var result = new List<MailingViewModel>();
 
@@ -149,19 +150,19 @@ namespace WebCustomerApp.Managers
             return result;
         }
 
-        public bool RemoveMailing(string AppUserId, int MailingId)
+        async public Task<bool> RemoveMailing(string AppUserId, int MailingId)
         {
             if (AppUserId == null)
                 return false;
-            var mailing = (from m in db.Mailings
+            var mailing = await (from m in db.Mailings
                            where m.Id == MailingId && m.SenderId == AppUserId
-                           select m).FirstOrDefault();
+                           select m).FirstOrDefaultAsync();
             if (mailing == null)
                 return false;
             else
             {
                 db.Mailings.Remove(mailing);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
                 return true;
             }
 
