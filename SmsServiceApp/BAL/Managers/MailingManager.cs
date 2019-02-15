@@ -176,5 +176,30 @@ namespace WebCustomerApp.Managers
             }
 
         }
+
+        async public Task<IEnumerable<MailingListItemViewModel>> GetMailingList(string AppUserId, int Num)
+        {
+            var mailings = await (from m in db.Mailings.Include(m => m.GroupMailings).ThenInclude(gm => gm.Group)
+                                  where m.SenderId == AppUserId
+                                  select m).Take(Num).OrderByDescending(m => m.DateOfCreation).ToListAsync();
+
+            var result = new List<MailingListItemViewModel>();
+
+            foreach (var iter in mailings)
+            {
+                result.Add(new MailingListItemViewModel()
+                {
+                    Id = iter.Id,
+                    Text = iter.Text,
+                    Title = iter.Title,
+                    TimeOfCreation = iter.DateOfCreation,
+                    Groups = ""
+                });
+                var groups = from gm in iter.GroupMailings
+                             select gm.Group.Title;
+                result.Last().Groups = String.Join(", ", groups);
+            }
+            return result;
+        }
     }
 }

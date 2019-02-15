@@ -1,0 +1,21 @@
+﻿@using WebCustomerApp.Models.MailingViewModels
+@model MailingListItemViewModel
+
+<li class="list-group-item">
+    @Model.Title, groups: @Model.Groups, created at: @Model.TimeOfCreation
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button class="btn btn-primary" type="button" data-toggle="collapse_@Model.Id" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+            Message
+        </button>
+        <button type="button" class="btn btn-secondary">Edit</button>
+        <button type="button" class="btn btn-secondary">Remove</button>
+    </div>
+    <div class="collapse" id="collapse_@Model.Id">
+        <div class="card card-body">
+            @Model.Text
+        </div>
+    </div>
+</li>
+
+
+

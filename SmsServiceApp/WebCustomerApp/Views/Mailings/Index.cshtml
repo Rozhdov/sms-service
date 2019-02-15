@@ -51,6 +51,13 @@
     { await Html.RenderPartialAsync("Mailing", jter); }
 }
 
+@*<ul class="list-group">
+    @foreach (MailingListItemViewModel eter in ViewBag.MailingList)
+    {
+        { await Html.RenderPartialAsync("MailingListItem", eter); }
+    }
+</ul>*@
+
 <script type="text/javascript">
     var iter;
     if (typeof iter == 'undefined')
@@ -90,10 +97,10 @@
 
 
 
-    <script type="text/javascript">
-        function FillTimesFunc() {
-            document.getElementById("timesform").value = dates.join();
-        }
+<script type="text/javascript">
+    function FillTimesFunc() {
+        document.getElementById("timesform").value = dates.join();
+    }
 </script>
 
 @section Scripts {

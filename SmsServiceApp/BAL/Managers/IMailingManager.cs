@@ -18,6 +18,7 @@ namespace WebCustomerApp.Managers
         //bool RemoveMailing(string AppUserId, int MailingId);
 
         Task<IEnumerable<MailingViewModel>> GetMailings(string AppUserId, int Num);
+        Task<IEnumerable<MailingListItemViewModel>> GetMailingList(string AppUserId, int Num);
         Task<MailingViewModel> FindMailing(string AppUserId, int MailingId);
         Task<MailingViewModel> GetEmptyMailing(string AppUserId);
 

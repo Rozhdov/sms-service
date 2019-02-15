@@ -30,6 +30,7 @@ namespace WebApp.Controllers
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             ViewBag.Mailings = await _mailingManager.GetMailings(userId, 20);
+            ViewBag.MailingList = await _mailingManager.GetMailingList(userId, 20);
             var newMailing = await _mailingManager.GetEmptyMailing(userId);
             return View(newMailing);
         }
