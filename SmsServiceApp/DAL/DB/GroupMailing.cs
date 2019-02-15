@@ -4,13 +4,12 @@ using System.Text;
 
 namespace WebCustomerApp.Models
 {
-    public class ContactGroup
+    public class GroupMailing
     {
-        public int ContactId { get; set; }
-        public Contact Contact { get; set; }
-
         public int GroupId { get; set; }
         public Group Group { get; set; }
 
+        public int MailingId { get; set; }
+        public Mailing Mailing { get; set; }
     }
 }

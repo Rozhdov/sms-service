@@ -31,15 +31,14 @@ namespace WebCustomerApp.Managers
             if (AppUserId == null || Mailing.Text == null || Mailing.GroupIds == null || Mailing.Times == null)
                 return false;
 
-            // searchin for recievers
-            var recievers = await (from cg in db.ContactGroups
-                            where Mailing.GroupIds.Contains(cg.UserContactGroupId)
-                            select cg.UserContact).Distinct().ToListAsync();
-            if (!recievers.Any())
+            // searchin for reciever groups
+            var groups = await (from g in db.Groups
+                            where Mailing.GroupIds.Contains(g.Id) && g.UserId == AppUserId
+                            select g).ToListAsync();
+            if (!groups.Any())
                 return false;
 
-            // creation and population of message list
-            var messages = new List<Message>();
+            // creation and population of Times list
             string[] rawTimes = Mailing.Times.Split(',');
             var times = (from rt in rawTimes
                          where Convert.ToDateTime(rt) > DateTime.UtcNow
@@ -53,25 +52,35 @@ namespace WebCustomerApp.Managers
                 SenderId = AppUserId,
                 Title = Mailing.Title,
                 Text = Mailing.Text,
-                DateOfCreation = DateTime.Now
+                DateOfCreation = DateTime.UtcNow
             };
-            db.Mailings.Add(newMailing);
 
-            foreach (var time in times)
+            // populating group - mailings
+            var groupMailings = new List<GroupMailing>();
+            foreach (var iter in groups)
             {
-                foreach (var reciever in recievers)
+                groupMailings.Add(new GroupMailing()
                 {
-                    messages.Add(new Message()
-                    {
-                        UserContact = reciever,
-                        TimeOfSending = time,
-                        Mailing = newMailing,
-                        BeenSent = false,
-                    });      
-                }
+                    Group = iter,
+                    Mailing = newMailing
+                });
             }
 
-            await db.Messages.AddRangeAsync(messages);
+            // creating sending times
+            var sendingTimes = new List<Time>();
+            foreach (var time in times)
+            {
+                sendingTimes.Add(new Time()
+                {
+                    TimeToSend = time,
+                    Mailing = newMailing,
+                    BeenSent = false,
+                });      
+            }
+
+            await db.Mailings.AddAsync(newMailing);
+            await db.Times.AddRangeAsync(sendingTimes);
+            await db.GroupMailings.AddRangeAsync(groupMailings);
             await db.SaveChangesAsync();
             return true;
         }
@@ -121,11 +130,11 @@ namespace WebCustomerApp.Managers
             if (AppUserId == null)
                 return null;
             var result = new MailingViewModel();
-            var availableGroups = await (from ucg in db.UserContactGroups
-                                  where ucg.UserId == AppUserId
-                                  select ucg).ToListAsync();
+            var availableGroups = await (from g in db.Groups
+                                  where g.UserId == AppUserId
+                                  select g).ToListAsync();
 
-            result.Groups = new MultiSelectList(availableGroups, "Id", "Group");
+            result.Groups = new MultiSelectList(availableGroups, "Id", "Title");
             return result;
         }
 

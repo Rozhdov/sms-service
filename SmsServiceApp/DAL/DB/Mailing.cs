@@ -7,7 +7,8 @@ namespace WebCustomerApp.Models
     public class Mailing
     {
         public int Id { get; set; }
-        public ICollection<Message> Messages { get; set; }
+        public IList<GroupMailing> GroupMailings { get; set; }
+        public IEnumerable<Time> Times { get; set; }
 
         public string SenderId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }

@@ -4,15 +4,16 @@ using System.Text;
 
 namespace WebCustomerApp.Models
 {
-    public class UserContactGroup
+    public class Contact
     {
         public int Id { get; set; }
-        public ICollection<ContactGroup> ContactGroups { get; set; }
+        public IList<ContactGroup> ContactGroups { get; set; }
+
 
         public string UserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
 
-        public string Group { get; set; }
-        public string Description { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Name { get; set; }
     }
 }
