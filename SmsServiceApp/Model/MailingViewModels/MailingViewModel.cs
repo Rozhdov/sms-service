@@ -31,7 +31,7 @@ namespace WebCustomerApp.Models.MailingViewModels
         public MultiSelectList Groups { get; set; }
 
         [Display(Name = "Times")]
-        public DateTime[] Times { get; set; }
+        public string Times { get; set; }
 
     }
 }

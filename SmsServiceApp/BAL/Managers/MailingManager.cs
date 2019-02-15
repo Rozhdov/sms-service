@@ -30,6 +30,22 @@ namespace WebCustomerApp.Managers
             if (AppUserId == null || Mailing.Text == null || Mailing.GroupIds == null)
                 return false;
 
+            // searchin for recievers
+            var recievers = (from cg in db.ContactGroups
+                            where Mailing.GroupIds.Contains(cg.UserContactGroupId)
+                            select cg.UserContact).Distinct();
+            if (!recievers.Any())
+                return false;
+
+            // creation and population of message list
+            var messages = new List<Message>();
+            string[] rawTimes = Mailing.Times.Split(',');
+            var times = (from rt in rawTimes
+                         where Convert.ToDateTime(rt) > DateTime.UtcNow
+                         select Convert.ToDateTime(rt)).Distinct();
+            if (!times.Any())
+                return false;
+
             // creating new mailing
             var newMailing = new Mailing()
             {
@@ -40,14 +56,7 @@ namespace WebCustomerApp.Managers
             };
             db.Mailings.Add(newMailing);
 
-            // searchin for recievers
-            var recievers = from cg in db.ContactGroups
-                            where Mailing.GroupIds.Contains(cg.UserContactGroupId)
-                            select cg.UserContact;
-
-            // creation and population of message list
-            var messages = new List<Message>();
-            foreach (var time in Mailing.Times)
+            foreach (var time in times)
             {
                 foreach (var reciever in recievers)
                 {
@@ -68,12 +77,42 @@ namespace WebCustomerApp.Managers
 
         public bool EditMailing(string AppUserId, MailingViewModel Mailing)
         {
-            throw new NotImplementedException();
+            if (AppUserId == null || Mailing.Text == null)
+                return false;
+
+            var editedMailing = (from m in db.Mailings
+                                 where m.SenderId == AppUserId && m.Id == Mailing.Id
+                                 select m).FirstOrDefault();
+
+            if (editedMailing == null)
+                return false;
+
+            editedMailing.Text = Mailing.Text;
+            editedMailing.Title = Mailing.Title;
+            db.SaveChanges();
+            return true;
         }
 
         public MailingViewModel FindMailing(string AppUserId, int MailingId)
         {
-            throw new NotImplementedException();
+            if (AppUserId == null)
+                return null;
+            var mailing = (from m in db.Mailings
+                         where m.Id == MailingId && m.SenderId == AppUserId
+                         select m).FirstOrDefault();
+            if (mailing == null)
+                return null;
+            else
+            {
+                var result = new MailingViewModel()
+                {
+                    Title = mailing.Title,
+                    Text = mailing.Text,
+                    Id = mailing.Id,
+                    TimeOfCreation = mailing.DateOfCreation
+                };
+                return result;
+            }
         }
 
         public MailingViewModel GetEmptyMailing(string AppUserId)
@@ -93,7 +132,7 @@ namespace WebCustomerApp.Managers
         {
             var mailings = (from m in db.Mailings
                             where m.SenderId == AppUserId
-                            select m).Take(Num);
+                            select m).Take(Num).OrderByDescending(m => m.DateOfCreation);
 
             var result = new List<MailingViewModel>();
 
@@ -103,7 +142,7 @@ namespace WebCustomerApp.Managers
                 {
                     Id = iter.Id,
                     Text = iter.Text,
-                    Title = iter.Text,
+                    Title = iter.Title,
                     TimeOfCreation = iter.DateOfCreation
                 });
             }
@@ -112,7 +151,20 @@ namespace WebCustomerApp.Managers
 
         public bool RemoveMailing(string AppUserId, int MailingId)
         {
-            throw new NotImplementedException();
+            if (AppUserId == null)
+                return false;
+            var mailing = (from m in db.Mailings
+                           where m.Id == MailingId && m.SenderId == AppUserId
+                           select m).FirstOrDefault();
+            if (mailing == null)
+                return false;
+            else
+            {
+                db.Mailings.Remove(mailing);
+                db.SaveChanges();
+                return true;
+            }
+
         }
     }
 }

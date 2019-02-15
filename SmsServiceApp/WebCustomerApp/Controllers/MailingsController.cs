@@ -41,13 +41,11 @@ namespace WebApp.Controllers
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                NewMailing.Times = new DateTime[] { DateTime.Now};
                 bool result = _mailingManager.AddMailing(userId, NewMailing);
-                if (result)
+                if (!result)
                 {
                     ModelState.AddModelError(string.Empty, "Adding failed");
-                    ViewBag.Mailings = _mailingManager.GetMailings(userId, 20);
-                    return View(NewMailing);
+                    return RedirectToAction("Index", "Mailings");
                 }
                 else
                 {
@@ -55,8 +53,42 @@ namespace WebApp.Controllers
                 }
             }
             return RedirectToAction("Index", "Mailings");
+        }
 
+        public IActionResult Remove(int MailingId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            bool result = _mailingManager.RemoveMailing(userId, MailingId);
+            if (!result)
+            {
+                ModelState.AddModelError(string.Empty, "Removal failed");
+                return RedirectToAction("Index", "Mailings");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Mailings");
+            }
+        }
+        
 
+        [HttpPost]
+        public IActionResult Mailing(MailingViewModel EditedMailing)
+        {
+            if (ModelState.IsValid)
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                bool result = _mailingManager.EditMailing(userId, EditedMailing);
+                if (!result)
+                {
+                    ModelState.AddModelError(string.Empty, "Editing failed");
+                    return RedirectToAction("Index", "Mailings");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Mailings");
+                }
+            }
+            return RedirectToAction("Index", "Mailings");
         }
     }
 }
