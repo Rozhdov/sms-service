@@ -45,18 +45,23 @@
 
 
 
-
-@foreach (MailingViewModel jter in ViewBag.Mailings)
-{
-    { await Html.RenderPartialAsync("Mailing", jter); }
-}
-
-@*<ul class="list-group">
-    @foreach (MailingListItemViewModel eter in ViewBag.MailingList)
-    {
-        { await Html.RenderPartialAsync("MailingListItem", eter); }
-    }
-</ul>*@
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Groups</th>
+            <th scope="col">Date added</th>
+            <th scope="col">Message</th>
+            <th scope="col">Controls</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (MailingListItemViewModel eter in ViewBag.MailingList)
+        {
+            { await Html.RenderPartialAsync("MailingListItem", eter); }
+        }
+    </tbody>
+</table>
 
 <script type="text/javascript">
     var iter;
@@ -69,6 +74,14 @@
 <script type="text/javascript">
     function AddTimeFunc() {
         var input = document.getElementById("datetimeinput").value;
+        if (dates.indexOf(input) > -1)
+            return;
+        if (input == "")
+            return;
+        var inputDate = new Date(Date.UTC(Number(input.slice(6, 10)), Number(input.slice(3, 5)) - 1, Number(input.slice(0, 2)) + 1));
+        var currentDate = new Date();
+        if (inputDate <= currentDate)
+            return;
         dates[iter] = input;
         var show = document.getElementById("timeslist");
         show.innerHTML += '<button type="button" class="list-group-item list-group-item-action" id="time' + iter + '" onclick="RemoveTimeFunc(' + iter + ')">' + input + '</button>';

@@ -71,9 +71,24 @@ namespace WebApp.Controllers
             }
         }
         
+        [HttpGet]
+        async public Task<IActionResult> Edit(int MailingId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            MailingViewModel mailingToEdit = await _mailingManager.FindMailing(userId, MailingId);
+            if (mailingToEdit == null)
+            {
+                ModelState.AddModelError(string.Empty, "Failure");
+                return RedirectToAction("Index", "Mailings");
+            }
+            else
+            {
+                return View(mailingToEdit);
+            }
+        }
 
         [HttpPost]
-        async public Task<IActionResult> Mailing(MailingViewModel EditedMailing)
+        async public Task<IActionResult> Edit(MailingViewModel EditedMailing)
         {
             if (ModelState.IsValid)
             {
@@ -81,15 +96,19 @@ namespace WebApp.Controllers
                 bool result = await _mailingManager.EditMailing(userId, EditedMailing);
                 if (!result)
                 {
-                    ModelState.AddModelError(string.Empty, "Editing failed");
-                    return RedirectToAction("Index", "Mailings");
+                    MailingViewModel mailingToEdit = await _mailingManager.FindMailing(userId, EditedMailing.Id);
+                    ModelState.AddModelError(string.Empty, "Adding failed");
+                    return View(mailingToEdit);
                 }
                 else
                 {
                     return RedirectToAction("Index", "Mailings");
                 }
             }
-            return RedirectToAction("Index", "Mailings");
+            else
+            {
+                return RedirectToAction("Edit", "Mailings");
+            }
         }
     }
 }

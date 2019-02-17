@@ -24,12 +24,14 @@ namespace WebCustomerApp.Models.MailingViewModels
         [Display(Name = "Time of creation")]
         public DateTime TimeOfCreation { get; set; }
 
+        [Required]
         [Display(Name = "Groups")]
         public int[] GroupIds { get; set; }
 
         [Display(Name = "Groups")]
         public MultiSelectList Groups { get; set; }
 
+        [Required]
         [Display(Name = "Times")]
         public string Times { get; set; }
 

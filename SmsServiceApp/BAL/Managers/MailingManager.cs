@@ -87,9 +87,11 @@ namespace WebCustomerApp.Managers
 
         async public Task<bool> EditMailing(string AppUserId, MailingViewModel Mailing)
         {
-            if (AppUserId == null || Mailing.Text == null)
+            // check on required fields
+            if (AppUserId == null || Mailing.Text == null || Mailing.GroupIds == null)
                 return false;
 
+            // search for edited mailing
             var editedMailing = await (from m in db.Mailings
                                  where m.SenderId == AppUserId && m.Id == Mailing.Id
                                  select m).FirstOrDefaultAsync();
@@ -97,8 +99,36 @@ namespace WebCustomerApp.Managers
             if (editedMailing == null)
                 return false;
 
+            // search for reciever groups
+            var groups = await (from g in db.Groups
+                                where Mailing.GroupIds.Contains(g.Id) && g.UserId == AppUserId
+                                select g).ToListAsync();
+            if (!groups.Any())
+                return false;
+
+            // Removal of mailing from every group
+
+            var groupMailings = await (from gm in db.GroupMailings
+                                       where gm.MailingId == editedMailing.Id
+                                       select gm).ToListAsync();
+
+            db.GroupMailings.RemoveRange(groupMailings);
+
+            // Population of recieved groups
+
+            var newGroupMailings = new List<GroupMailing>();
+            foreach (var iter in groups)
+            {
+                newGroupMailings.Add(new GroupMailing()
+                {
+                    Group = iter,
+                    Mailing = editedMailing
+                });
+            }
+
             editedMailing.Text = Mailing.Text;
             editedMailing.Title = Mailing.Title;
+            await db.GroupMailings.AddRangeAsync(newGroupMailings);
             await db.SaveChangesAsync();
             return true;
         }
@@ -107,22 +137,30 @@ namespace WebCustomerApp.Managers
         {
             if (AppUserId == null)
                 return null;
-            var mailing = await (from m in db.Mailings
+            var mailing = await (from m in db.Mailings.Include(m => m.GroupMailings).ThenInclude(gm => gm.Group)
                          where m.Id == MailingId && m.SenderId == AppUserId
                          select m).FirstOrDefaultAsync();
             if (mailing == null)
                 return null;
-            else
+                        
+            var result = new MailingViewModel()
             {
-                var result = new MailingViewModel()
-                {
-                    Title = mailing.Title,
-                    Text = mailing.Text,
-                    Id = mailing.Id,
-                    TimeOfCreation = mailing.DateOfCreation
-                };
-                return result;
-            }
+                Title = mailing.Title,
+                Text = mailing.Text,
+                Id = mailing.Id,
+                TimeOfCreation = mailing.DateOfCreation
+            };
+
+            var selectedGroups = from gm in mailing.GroupMailings
+                                 select gm.Group.Id;
+
+            var availableGroups = await (from g in db.Groups
+                                         where g.UserId == AppUserId
+                                         select g).ToListAsync();
+
+            result.Groups = new MultiSelectList(availableGroups, "Id", "Title", selectedGroups);
+
+            return result;
         }
 
         async public Task<MailingViewModel> GetEmptyMailing(string AppUserId)

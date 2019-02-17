@@ -1,0 +1,30 @@
+﻿@using WebCustomerApp.Models.MailingViewModels
+@model MailingViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" asp-controller="Mailings" method="post" asp-antiforgery="true">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input asp-for="Id" type="hidden" class="form-control" />
+    <div class="form-group row">
+        <label asp-for="Title">Title</label>
+        <input asp-for="Title" type="text" class="form-control" placeholder="Title of mailing" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="form-group row">
+        <label asp-for="Text">Message</label>
+        <textarea asp-for="Text" class="form-control" placeholder="Message"></textarea>
+        <span asp-validation-for="Text" class="text-danger"></span>
+    </div>
+    <div class="form-group row">
+        <label asp-for="GroupIds"></label>
+        <select asp-for="GroupIds" asp-items="Model.Groups" multiple class="form-control"></select>
+    </div>
+    <div class="form-group row">
+        <button type="submit" class="btn btn-default" onclick="FillTimesFunc()">Save changes</button>
+    </div>
+</form>
