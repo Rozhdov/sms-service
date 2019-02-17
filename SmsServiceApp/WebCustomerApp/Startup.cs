@@ -48,7 +48,7 @@ namespace WebCustomerApp
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
-            services.AddTransient<ILogger, XmlLogger>(l => 
+            services.AddTransient<IMessageLogger, XmlLogger>(l => 
             {
                 return new XmlLogger("MessageLog.xml");
             });

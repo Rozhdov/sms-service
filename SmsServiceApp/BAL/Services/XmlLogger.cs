@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace WebCustomerApp.Services
 {
-    public class XmlLogger : ILogger
+    public class XmlLogger : IMessageLogger
     {
         private string saveLocation;
 

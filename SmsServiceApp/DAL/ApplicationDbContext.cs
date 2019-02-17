@@ -21,6 +21,7 @@ namespace WebCustomerApp.Data
         public virtual DbSet<Mailing> Mailings { get; set; }
         public virtual DbSet<ContactGroup> ContactGroups { get; set; }
         public virtual DbSet<GroupMailing> GroupMailings { get; set; }
+        public DbQuery<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -120,7 +121,7 @@ namespace WebCustomerApp.Data
                 .HasIndex(ur => new { ur.UserId, ur.Title })
                 .IsUnique();
 
-            //setting sizes
+            // setting sizes
 
             builder.Entity<Contact>()
                 .Property(u => u.Name)
@@ -131,7 +132,29 @@ namespace WebCustomerApp.Data
                 .Property(ma => ma.Title)
                 .IsRequired(true);
 
+            // setting queries
 
+            // does not work for some reason
+
+            //builder.Query<Message>().ToQuery(() => from t in Times
+            //                                       join m in Mailings on t.MailingId equals m.Id
+            //                                       join gm in GroupMailings on m.Id equals gm.MailingId
+            //                                       join g in Groups on gm.GroupId equals g.Id
+            //                                       join cg in ContactGroups on g.Id equals cg.GroupId
+            //                                       join c in Contacts on cg.ContactId equals c.Id
+            //                                       where t.BeenSent == false && t.TimeToSend > DateTime.UtcNow
+            //                                       select new Message
+            //                                       {
+            //                                           Sender = c.PhoneNumber,
+            //                                           Reciever = c.PhoneNumber,
+            //                                           Text = m.Text
+            //                                       });
+
+
+            builder.Query<Message>().ToView("View_MessagesToSend");
+            builder.Query<Message>().Property(m => m.Sender).HasColumnName("Sender");
+            builder.Query<Message>().Property(m => m.Reciever).HasColumnName("Reciever");
+            builder.Query<Message>().Property(m => m.Text).HasColumnName("MessageText");
 
 
         }

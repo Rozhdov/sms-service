@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WebCustomerApp.DB
+namespace WebCustomerApp.Models
 {
     public class Message
     {
-        public string Sender { get; private set; }
-        public string Reciever { get; private set; }
-        public string Text { get; private set; }
+        public string Sender { get; set; }
+        public string Reciever { get; set; }
+        public string Text { get; set; }
     }    
 }
