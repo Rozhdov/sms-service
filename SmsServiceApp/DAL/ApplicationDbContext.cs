@@ -142,6 +142,7 @@ namespace WebCustomerApp.Data
             //                                       join g in Groups on gm.GroupId equals g.Id
             //                                       join cg in ContactGroups on g.Id equals cg.GroupId
             //                                       join c in Contacts on cg.ContactId equals c.Id
+            //                                       join u in Users on c.UserId equals u.Id
             //                                       where t.BeenSent == false && t.TimeToSend > DateTime.UtcNow
             //                                       select new Message
             //                                       {
