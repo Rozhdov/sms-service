@@ -4,6 +4,7 @@ using System.Text;
 using WebCustomerApp.Models.MailingViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Threading.Tasks;
+using WebCustomerApp.Models;
 
 namespace WebCustomerApp.Managers
 {
@@ -17,8 +18,5 @@ namespace WebCustomerApp.Managers
         Task<bool> AddMailing(string AppUserId, MailingViewModel Mailing);
         Task<bool> EditMailing(string AppUserId, MailingViewModel Mailing);
         Task<bool> RemoveMailing(string AppUserId, int MailingId);
-
-        // Methods for sending service
-
     }
 }

@@ -132,6 +132,10 @@ namespace WebCustomerApp.Data
                 .Property(ma => ma.Title)
                 .IsRequired(true);
 
+            builder.Entity<ApplicationUser>()
+                .Property(u => u.PhoneNumber)
+                .HasMaxLength(13);
+
             // setting queries
 
             // does not work for some reason
@@ -151,11 +155,13 @@ namespace WebCustomerApp.Data
             //                                           Text = m.Text
             //                                       });
 
+            // should be redone with proper indexing. Look for Group by and Count_Big
 
             builder.Query<Message>().ToView("View_MessagesToSend");
             builder.Query<Message>().Property(m => m.Sender).HasColumnName("Sender");
             builder.Query<Message>().Property(m => m.Reciever).HasColumnName("Reciever");
             builder.Query<Message>().Property(m => m.Text).HasColumnName("MessageText");
+            builder.Query<Message>().Property(m => m.TimeId).HasColumnName("TimeId");
 
 
         }

@@ -9,5 +9,6 @@ namespace WebCustomerApp.Models
         public string Sender { get; set; }
         public string Reciever { get; set; }
         public string Text { get; set; }
+        public int TimeId { get; set; }
     }    
 }
