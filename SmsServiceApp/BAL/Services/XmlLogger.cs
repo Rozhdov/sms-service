@@ -17,7 +17,7 @@ namespace WebCustomerApp.Services
         }
 
 
-        public void Log(string Sender, IEnumerable<string> Recievers, string Message, DateTime SendingTime)
+        public void Log(string Sender, string Reciever, string Message, DateTime SendingTime)
         {
             XElement MessagesLog;
             try
@@ -31,7 +31,7 @@ namespace WebCustomerApp.Services
 
             MessagesLog.Add(new XElement("Message",
                                    new XElement("Sender", Sender),
-                                   new XElement("Recievers", Recievers),
+                                   new XElement("Reciever", Reciever),
                                    new XElement("Text", Message),
                                    new XAttribute("Date_and_time", Convert.ToString(SendingTime))
                                    ));

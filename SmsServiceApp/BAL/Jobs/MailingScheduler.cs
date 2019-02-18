@@ -30,7 +30,7 @@ namespace WebCustomerApp.Jobs
                 .WithIdentity("triggerMailing", "mainGroup")
                 .StartNow()
                 .WithSimpleSchedule(x => x
-                .WithIntervalInMinutes(5)
+                .WithIntervalInMinutes(1)
                 .RepeatForever()).Build();
 
             await scheduler.ScheduleJob(job, trigger);

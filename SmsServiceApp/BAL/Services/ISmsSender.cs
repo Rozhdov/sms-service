@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace WebCustomerApp.Services
 {
-    public interface IMessageLogger
+    interface ISmsSender
     {
-        void Log(string Sender, string Reciever, string Message, DateTime SendingTime);
+        Task Send(string Sender, string Reciever, string Message, string Key);
     }
 }

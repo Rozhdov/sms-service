@@ -41,7 +41,8 @@ namespace WebCustomerApp.Managers
             // creation and population of Times list
             string[] rawTimes = Mailing.Times.Split(',');
             var times = (from rt in rawTimes
-                         where Convert.ToDateTime(rt) > DateTime.UtcNow
+                         // for testing purposes
+                         //where Convert.ToDateTime(rt) > DateTime.UtcNow
                          select Convert.ToDateTime(rt)).Distinct();
             if (!times.Any())
                 return false;

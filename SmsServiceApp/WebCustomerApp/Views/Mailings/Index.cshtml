@@ -78,7 +78,8 @@
             return;
         if (input == "")
             return;
-        var inputDate = new Date(Date.UTC(Number(input.slice(6, 10)), Number(input.slice(3, 5)) - 1, Number(input.slice(0, 2)) + 1));
+        var inputDate = new Date(Date.UTC(Number(input.slice(6, 10)), Number(input.slice(3, 5)) - 1, Number(input.slice(0, 2)) + 3));
+        //var inputDate = new Date(Date.UTC(Number(input.slice(6, 10)), Number(input.slice(3, 5)) - 1, Number(input.slice(0, 2)) + 1));
         var currentDate = new Date();
         if (inputDate <= currentDate)
             return;

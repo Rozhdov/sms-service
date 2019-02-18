@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Messages>
+  <Message Date_and_time="18.02.2019 13:39:58">
+    <Sender>111</Sender>
+    <Reciever>222</Reciever>
+    <Text>Dolgonosik!</Text>
+  </Message>
+  <Message Date_and_time="18.02.2019 13:40:01">
+    <Sender>111</Sender>
+    <Reciever>2234</Reciever>
+    <Text>Dolgonosik!</Text>
+  </Message>
+  <Message Date_and_time="18.02.2019 13:40:01">
+    <Sender>111</Sender>
+    <Reciever>666</Reciever>
+    <Text>Dolgonosik!</Text>
+  </Message>
+</Messages>

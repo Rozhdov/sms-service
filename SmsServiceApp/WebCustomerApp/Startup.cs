@@ -13,6 +13,7 @@ using WebCustomerApp.Models;
 using WebCustomerApp.Services;
 using WebCustomerApp.Managers;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using WebCustomerApp.Jobs;
 
 namespace WebCustomerApp
 {
@@ -48,14 +49,16 @@ namespace WebCustomerApp
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
-            services.AddTransient<IMessageLogger, XmlLogger>(l => 
-            {
-                return new XmlLogger("MessageLog.xml");
-            });
 
             //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => {options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");});
 
             services.AddMvc();
+
+            // Quartz jobs
+
+            MailingScheduler.Start();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
